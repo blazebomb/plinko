@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+}
+
+// round status 
+enum RoundStatus {
+  CREATED
+  STARTED
+  REVEALED
+}
+
+model Round {
+  id               String      @id @default(cuid())
+  createdAt        DateTime    @default(now())
+  status           RoundStatus @default(CREATED)
+
+  nonce            String
+  commitHex        String
+  serverSeed       String?      // stays hidden until reveal
+  clientSeed       String?      // filled during start
+  combinedSeed     String?      // filled during start
+  pegMapHash       String?      // filled during start
+
+  rows             Int          @default(12) // 12-row board by default
+  dropColumn       Int?         // chosen during start
+  binIndex         Int?         // outcome after simulation
+  payoutMultiplier Float?       // outcome after simulation
+  betCents         Int?         // bet size arrives with start
+  pathJson         Json?        // JSON path stored after simulation
+
+  revealedAt       DateTime?
+}
+
+
