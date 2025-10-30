@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { PlinkoBoard } from './components/PlinkoBoard';
 import { useRoundFlow } from './hooks/useRoundFlow';
@@ -89,47 +90,33 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-slate-900 text-slate-50">
       <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-10">
-        <header className="space-y-2 text-center">
+        <header className="space-y-3 text-center">
           <h1 className="text-3xl font-bold">Plinko Lab - Minimal Build</h1>
           <p className="text-sm text-slate-200">
-            Click <strong>New Round</strong>, enter your seed / bet / column, then drop and reveal.
+            Click <strong>New Round</strong>, enter your seed, bet, and column, then drop and reveal.
             Every number is driven by the deterministic engine and backed by our tests.
           </p>
+          <div className="flex flex-wrap justify-center gap-3 text-sm">
+            <button
+              onClick={handleCommit}
+              disabled={loading !== null}
+              className="rounded bg-blue-500 px-4 py-2 font-medium text-white transition hover:bg-blue-400 disabled:opacity-50"
+            >
+              {loading === 'commit' ? 'Creating...' : 'New Round'}
+            </button>
+            <Link
+              href="/verify"
+              className="rounded border border-slate-600 px-4 py-2 font-medium text-slate-200 transition hover:bg-slate-700/70"
+            >
+              Open Verifier
+            </Link>
+          </div>
         </header>
 
         <section className="rounded-lg border border-slate-700 bg-slate-800 p-5 shadow-lg">
-          <h2 className="font-semibold">1. Commit</h2>
+          <h2 className="font-semibold">2. Start and Simulate</h2>
           <p className="text-sm text-slate-200">
-            The server picks a hidden <em>serverSeed</em> + <em>nonce</em>, stores the hash, and shares
-            the commit so you can hold us accountable.
-          </p>
-          <button
-            onClick={handleCommit}
-            disabled={loading !== null}
-            className="mt-3 rounded bg-blue-500 px-4 py-2 font-medium text-white transition hover:bg-blue-400 disabled:opacity-50"
-          >
-            {loading === 'commit' ? 'Creating...' : 'New Round'}
-          </button>
-
-          {state.commit && (
-            <div className="mt-3 space-y-1 text-sm">
-              <p>
-                <span className="font-medium">Round ID:</span> {state.commit.roundId}
-              </p>
-              <p className="wrap-break-word">
-                <span className="font-medium">Commit Hash:</span> {state.commit.commitHex}
-              </p>
-              <p>
-                <span className="font-medium">Nonce:</span> {state.commit.nonce}
-              </p>
-            </div>
-          )}
-        </section>
-
-        <section className="rounded-lg border border-slate-700 bg-slate-800 p-5 shadow-lg">
-          <h2 className="font-semibold">2. Start &amp; Simulate</h2>
-          <p className="text-sm text-slate-200">
-            Add your <em>clientSeed</em> plus bet + drop column. The engine combines the seeds,
+            Add your client seed along with bet amount and drop column. The engine combines the seeds,
             generates the peg map, and decides the entire path deterministically.
           </p>
 
@@ -191,16 +178,13 @@ export default function HomePage() {
                 Bin Index: <strong>{state.started.binIndex}</strong>
               </p>
               <p>
-                Payout Multiplier:{' '}
-                <strong>{state.started.payoutMultiplier.toFixed(2)}x</strong>
+                Payout Multiplier: <strong>{state.started.payoutMultiplier.toFixed(2)}x</strong>
               </p>
               <p>
-                Peg Map Hash:{' '}
-                <span className="wrap-break-word">{state.started.pegMapHash}</span>
+                Peg Map Hash: <span className="wrap-break-word">{state.started.pegMapHash}</span>
               </p>
               <p>
-                Combined Seed:{' '}
-                <span className="wrap-break-word">{state.started.combinedSeed}</span>
+                Combined Seed: <span className="wrap-break-word">{state.started.combinedSeed}</span>
               </p>
               <p>
                 Decisions: <code>{state.started.decisions.join(', ')}</code>
@@ -219,9 +203,9 @@ export default function HomePage() {
         </section>
 
         <section className="rounded-lg border border-slate-700 bg-slate-800 p-5 shadow-lg">
-          <h2 className="font-semibold">3. Reveal &amp; Verify</h2>
+          <h2 className="font-semibold">3. Reveal and Verify</h2>
           <p className="text-sm text-slate-200">
-            After the drop finishes, we reveal the server seed so you (or anyone else) can recompute
+            After the drop finishes, we reveal the server seed so you or anyone else can recompute
             the hash and path as proof of fairness.
           </p>
 
@@ -263,11 +247,11 @@ export default function HomePage() {
               </p>
               {state.commit && (
                 <p className="text-sm text-emerald-300">
-                  Tip: Plug the commit, serverSeed, clientSeed, nonce, and drop column into the{' '}
-                  <a href="/verify" className="underline">
-                    /verify page
-                  </a>{' '}
-                  or hit <code>/api/verify</code> directly to check the outputs.
+                  Tip: cross-check everything on the{' '}
+                  <Link href="/verify" className="underline">
+                    verifier page
+                  </Link>{' '}
+                  or hit <code>/api/verify</code> directly.
                 </p>
               )}
             </div>
